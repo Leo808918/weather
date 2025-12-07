@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人日志笔记</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ==================== 主容器 ==================== -->
+    <div class="container">
+        
+        <!-- ==================== 头部导航 ==================== -->
+        <header class="header">
+            <h1 class="logo">📝 我的日志</h1>
+            <div class="header-actions">
+                <!-- AI对话按钮 -->
+                <button class="btn-icon" id="toggleAI" title="AI助手">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/>
+                        <circle cx="8" cy="10" r="1.5" fill="currentColor"/>
+                        <circle cx="16" cy="10" r="1.5" fill="currentColor"/>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                    </svg>
+                </button>
+                <!-- 设置按钮 -->
+                <button class="btn-icon" id="openSettings" title="设置">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- ==================== 主要内容区域 ==================== -->
+        <main class="main-content">
+            
+            <!-- 左侧：日志列表 -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>日志列表</h2>
+                    <button class="btn-primary" id="newEntry">+ 新建</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索日志...">
+                </div>
+                <!-- 日志列表容器 -->
+                <div class="entries-list" id="entriesList">
+                    <!-- 日志条目将通过JS动态生成 -->
+                </div>
+                <!-- 导入导出按钮 -->
+                <div class="sidebar-footer">
+                    <button class="btn-footer" id="exportData" title="导出数据">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        导出
+                    </button>
+                    <button class="btn-footer" id="importData" title="导入数据">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        导入
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+            </aside>
+
+            <!-- 右侧：日志编辑区域 -->
+            <section class="editor-section">
+                <div class="editor-container" id="editorContainer">
+                    <!-- 空状态提示 -->
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">📖</div>
+                        <p>选择一篇日志查看，或点击"新建"开始写作</p>
+                    </div>
+                    
+                    <!-- 日志编辑器（默认隐藏） -->
+                    <div class="editor" id="editor" style="display: none;">
+                        <div class="editor-header">
+                            <input type="date" id="entryDate" class="date-input">
+                            <div class="editor-actions">
+                                <button class="btn-save" id="saveEntry">保存</button>
+                                <button class="btn-delete" id="deleteEntry">删除</button>
+                            </div>
+                        </div>
+                        <input type="text" id="entryTitle" class="title-input" placeholder="日志标题...">
+                        <textarea id="entryContent" class="content-input" placeholder="写下今天的想法..."></textarea>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ==================== AI对话侧边栏 ==================== -->
+    <div class="ai-sidebar" id="aiSidebar">
+        <div class="ai-header">
+            <h3>🤖 AI助手</h3>
+            <button class="btn-close" id="closeAI">×</button>
+        </div>
+        <div class="ai-messages" id="aiMessages">
+            <!-- AI对话消息将通过JS动态生成 -->
+            <div class="ai-welcome">
+                <p>你好！我是通义千问AI助手。</p>
+                <p>你可以问我任何问题，或者让我帮你整理日志内容。</p>
+            </div>
+        </div>
+        <div class="ai-input-area">
+            <textarea id="aiInput" placeholder="输入你的问题..." rows="2"></textarea>
+            <button class="btn-send" id="sendAI">发送</button>
+        </div>
+    </div>
+
+    <!-- ==================== 设置弹窗 ==================== -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ 设置</h3>
+                <button class="btn-close" id="closeSettings">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>API Key 状态</label>
+                    <div id="apiKeyStatus" class="api-status">
+                        <span class="status-checking">🔄 检查中...</span>
+                    </div>
+                    <small>API Key 从系统环境变量 DASHSCOPE_API_KEY 读取</small>
+                </div>
+                <div class="form-group">
+                    <label for="modelSelect">模型选择</label>
+                    <select id="modelSelect">
+                        <option value="qwen-turbo">qwen-turbo (快速)</option>
+                        <option value="qwen-plus">qwen-plus (平衡)</option>
+                        <option value="qwen-max">qwen-max (强力)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>使用说明</label>
+                    <div class="help-text">
+                        <p>1. 在终端运行: <code>python server.py</code></p>
+                        <p>2. 保持终端窗口打开</p>
+                        <p>3. 然后就可以使用 AI 对话功能了</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>💾 数据存储</label>
+                    <div class="help-text">
+                        <p>✅ 日志数据自动保存到本地文件</p>
+                        <p>📁 存储位置: <code>data/entries.json</code></p>
+                        <p>🔄 同时备份到浏览器本地存储</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="refreshStatus">刷新状态</button>
+                <button class="btn-primary" id="saveSettings">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 遮罩层 ==================== -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ==================== 脚本文件 ==================== -->
+    <script src="app.js"></script>
+    <script src="ai-chat.js"></script>
+</body>
+</html>
+
