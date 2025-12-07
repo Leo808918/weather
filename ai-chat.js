@@ -22,8 +22,10 @@ let apiConfig = {
 // API Key 状态
 let apiKeyConfigured = false;
 
-// 本地服务器地址
-const LOCAL_SERVER = 'http://localhost:8000';
+// 自动检测 API 服务器地址
+// 如果是本地开发（localhost），使用本地服务器；否则使用相对路径（Vercel）
+const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE = isLocalDev ? 'http://localhost:8000' : '';
 
 // ==================== DOM元素引用 ====================
 
@@ -66,7 +68,7 @@ function initAI() {
  */
 async function checkAPIStatus() {
     try {
-        const response = await fetch(`${LOCAL_SERVER}/api/check`);
+        const response = await fetch(`${API_BASE}/api/check`);
         const data = await response.json();
         
         apiKeyConfigured = data.configured;
@@ -305,7 +307,7 @@ async function callQwenAPI(userMessage) {
     ];
     
     // 通过本地服务器发送请求
-    const response = await fetch(`${LOCAL_SERVER}/api/chat`, {
+    const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

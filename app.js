@@ -19,11 +19,12 @@ let entries = [];
 // 当前正在编辑的日志ID
 let currentEntryId = null;
 
-// 本地服务器地址
-const LOCAL_SERVER = 'http://localhost:8000';
+// 自动检测 API 服务器地址
+const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE = isLocalDev ? 'http://localhost:8000' : '';
 
-// 是否使用服务器存储（如果服务器不可用则回退到localStorage）
-let useServerStorage = true;
+// 是否使用服务器存储（本地环境使用服务器存储，Vercel环境使用localStorage）
+let useServerStorage = isLocalDev;
 
 // ==================== DOM元素引用 ====================
 
@@ -63,7 +64,7 @@ async function init() {
  */
 async function loadEntries() {
     try {
-        const response = await fetch(`${LOCAL_SERVER}/api/entries`);
+        const response = await fetch(`${API_BASE}/api/entries`);
         const data = await response.json();
         
         if (data.success) {
@@ -95,7 +96,7 @@ async function saveEntriesToStorage() {
     // 如果服务器可用，也保存到服务器
     if (useServerStorage) {
         try {
-            const response = await fetch(`${LOCAL_SERVER}/api/entries`, {
+            const response = await fetch(`${API_BASE}/api/entries`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
