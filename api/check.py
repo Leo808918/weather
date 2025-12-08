@@ -23,4 +23,3 @@ def handler(request):
             'message': 'API Key 已配置' if has_key else '未配置 DASHSCOPE_API_KEY 环境变量'
         })
     }
-

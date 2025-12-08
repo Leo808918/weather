@@ -75,9 +75,15 @@ async function checkAPIStatus() {
         updateAPIStatusUI(data.configured, data.message);
         
     } catch (error) {
-        // 服务器未运行
-        apiKeyConfigured = false;
-        updateAPIStatusUI(false, '本地服务器未运行，请先启动 server.py');
+        // 在 Vercel 环境下，即使检查失败也允许尝试发送（可能是网络问题）
+        if (isLocalDev) {
+            apiKeyConfigured = false;
+            updateAPIStatusUI(false, '本地服务器未运行，请先启动 server.py');
+        } else {
+            // Vercel 环境下，假设 API 可用，让用户尝试发送
+            apiKeyConfigured = true;
+            updateAPIStatusUI(true, 'Vercel 环境 - 如果无法使用，请检查环境变量配置');
+        }
     }
 }
 
@@ -146,6 +152,18 @@ function saveChatHistory() {
  * 绑定AI相关事件
  */
 function bindAIEvents() {
+    // 检查元素是否存在
+    if (!toggleAIBtn) {
+        console.error('AI 按钮元素未找到');
+        return;
+    }
+    if (!aiSidebar) {
+        console.error('AI 侧边栏元素未找到');
+        return;
+    }
+    
+    console.log('绑定 AI 事件监听器');
+    
     // 打开/关闭AI侧边栏
     toggleAIBtn.addEventListener('click', toggleAISidebar);
     closeAIBtn.addEventListener('click', closeAISidebar);
@@ -191,10 +209,22 @@ function bindAIEvents() {
 /**
  * 切换AI侧边栏显示状态
  */
-function toggleAISidebar() {
+function toggleAISidebar(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    console.log('点击了 AI 按钮，当前状态:', aiSidebar.classList.contains('active'));
+    if (!aiSidebar) {
+        console.error('AI 侧边栏元素未找到');
+        return;
+    }
     aiSidebar.classList.toggle('active');
+    console.log('切换后状态:', aiSidebar.classList.contains('active'));
     if (aiSidebar.classList.contains('active')) {
-        aiInput.focus();
+        if (aiInput) {
+            aiInput.focus();
+        }
         // 打开时检查状态
         checkAPIStatus();
     }
@@ -234,8 +264,8 @@ async function sendMessage() {
     const message = aiInput.value.trim();
     if (!message) return;
     
-    // 检查 API 状态
-    if (!apiKeyConfigured) {
+    // 在本地环境下检查 API 状态
+    if (isLocalDev && !apiKeyConfigured) {
         showToast('请先启动本地服务器 (python server.py)');
         return;
     }

@@ -13,8 +13,13 @@ def handler(request):
     处理 AI 对话请求
     Vercel Serverless Function 入口
     """
+    # 获取请求方法和路径
+    method = request.get('method', 'GET')
+    headers = request.get('headers', {})
+    body = request.get('body', '')
+    
     # 处理 CORS 预检请求
-    if request.method == 'OPTIONS':
+    if method == 'OPTIONS':
         return {
             'statusCode': 200,
             'headers': {
@@ -26,10 +31,13 @@ def handler(request):
         }
     
     # 只允许 POST 请求
-    if request.method != 'POST':
+    if method != 'POST':
         return {
             'statusCode': 405,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
             'body': json.dumps({'error': {'message': 'Method not allowed', 'code': 405}})
         }
     
@@ -53,10 +61,12 @@ def handler(request):
     
     try:
         # 解析请求体
-        body = request.body
         if isinstance(body, bytes):
             body = body.decode('utf-8')
-        request_data = json.loads(body)
+        if isinstance(body, str):
+            request_data = json.loads(body)
+        else:
+            request_data = body if body else {}
         
         # 通义千问 API 地址
         api_url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
@@ -85,7 +95,10 @@ def handler(request):
         }
         
     except urllib.error.HTTPError as e:
-        error_body = e.read().decode('utf-8')
+        try:
+            error_body = e.read().decode('utf-8')
+        except:
+            error_body = str(e)
         return {
             'statusCode': e.code,
             'headers': {
@@ -113,4 +126,3 @@ def handler(request):
                 }
             })
         }
-
