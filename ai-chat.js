@@ -91,24 +91,20 @@ function initAI() {
  */
 async function checkAPIStatus() {
     const checkUrl = `${API_BASE}/api/check`;
-    console.log('🔍 检查 API 状态，URL:', checkUrl);
     
     try {
         const response = await fetch(checkUrl);
-        console.log('📡 API 检查响应状态:', response.status);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const data = await response.json();
-        console.log('📦 API 检查响应数据:', data);
-        
         apiKeyConfigured = data.configured;
         updateAPIStatusUI(data.configured, data.message);
         
     } catch (error) {
-        console.error('❌ API 状态检查失败:', error);
+        console.error('API 状态检查失败:', error);
         // 在 Vercel 环境下，即使检查失败也允许尝试发送（可能是网络问题）
         if (isLocalDev) {
             apiKeyConfigured = false;
@@ -430,7 +426,7 @@ async function callQwenAPI(userMessage) {
  */
 function addMessageToUI(role, content) {
     if (!aiMessages) {
-        console.error('❌ 消息容器元素未找到');
+        console.error('消息容器元素未找到');
         return;
     }
     // 移除欢迎消息（如果存在）
@@ -462,7 +458,7 @@ function addMessageToUI(role, content) {
  */
 function showLoading() {
     if (!aiMessages) {
-        console.error('❌ 消息容器元素未找到');
+        console.error('消息容器元素未找到');
         return null;
     }
     const loadingId = 'loading-' + Date.now();
@@ -501,7 +497,7 @@ function removeLoading(loadingId) {
  */
 function renderChatHistory() {
     if (!aiMessages) {
-        console.error('❌ 消息容器元素未找到');
+        console.error('消息容器元素未找到');
         return;
     }
     // 清空现有消息（保留欢迎消息的容器）
