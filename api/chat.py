@@ -13,9 +13,8 @@ def handler(request):
     处理 AI 对话请求
     Vercel Serverless Function 入口
     """
-    # 获取请求方法和路径
+    # Vercel 传递的 request 是一个字典
     method = request.get('method', 'GET')
-    headers = request.get('headers', {})
     body = request.get('body', '')
     
     # 处理 CORS 预检请求
@@ -109,6 +108,20 @@ def handler(request):
                 'error': {
                     'message': f'API 请求失败: {error_body}',
                     'code': e.code
+                }
+            })
+        }
+    except json.JSONDecodeError as e:
+        return {
+            'statusCode': 400,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                'error': {
+                    'message': f'无效的 JSON 数据: {str(e)}',
+                    'code': 400
                 }
             })
         }

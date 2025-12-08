@@ -29,20 +29,27 @@ const API_BASE = isLocalDev ? 'http://localhost:8000' : '';
 
 // ==================== DOM元素引用 ====================
 
-const aiSidebar = document.getElementById('aiSidebar');
-const aiMessages = document.getElementById('aiMessages');
-const aiInput = document.getElementById('aiInput');
-const sendAIBtn = document.getElementById('sendAI');
-const toggleAIBtn = document.getElementById('toggleAI');
-const closeAIBtn = document.getElementById('closeAI');
+// 延迟获取 DOM 元素，确保在 DOM 加载完成后
+let aiSidebar, aiMessages, aiInput, sendAIBtn, toggleAIBtn, closeAIBtn;
+let settingsModal, openSettingsBtn, closeSettingsBtn, saveSettingsBtn;
+let apiKeyStatus, modelSelect, overlay;
 
-const settingsModal = document.getElementById('settingsModal');
-const openSettingsBtn = document.getElementById('openSettings');
-const closeSettingsBtn = document.getElementById('closeSettings');
-const saveSettingsBtn = document.getElementById('saveSettings');
-const apiKeyStatus = document.getElementById('apiKeyStatus');
-const modelSelect = document.getElementById('modelSelect');
-const overlay = document.getElementById('overlay');
+function getDOMElements() {
+    aiSidebar = document.getElementById('aiSidebar');
+    aiMessages = document.getElementById('aiMessages');
+    aiInput = document.getElementById('aiInput');
+    sendAIBtn = document.getElementById('sendAI');
+    toggleAIBtn = document.getElementById('toggleAI');
+    closeAIBtn = document.getElementById('closeAI');
+    
+    settingsModal = document.getElementById('settingsModal');
+    openSettingsBtn = document.getElementById('openSettings');
+    closeSettingsBtn = document.getElementById('closeSettings');
+    saveSettingsBtn = document.getElementById('saveSettings');
+    apiKeyStatus = document.getElementById('apiKeyStatus');
+    modelSelect = document.getElementById('modelSelect');
+    overlay = document.getElementById('overlay');
+}
 
 // ==================== 初始化函数 ====================
 
@@ -50,6 +57,21 @@ const overlay = document.getElementById('overlay');
  * AI模块初始化
  */
 function initAI() {
+    // 先获取 DOM 元素
+    getDOMElements();
+    
+    // 检查关键元素是否存在
+    if (!toggleAIBtn) {
+        console.error('❌ AI 按钮元素未找到，请检查 HTML 结构');
+        return;
+    }
+    if (!aiSidebar) {
+        console.error('❌ AI 侧边栏元素未找到，请检查 HTML 结构');
+        return;
+    }
+    
+    console.log('✅ AI 模块初始化成功');
+    
     // 加载保存的配置
     loadConfig();
     
@@ -67,14 +89,25 @@ function initAI() {
  * 检查本地服务器和 API Key 状态
  */
 async function checkAPIStatus() {
+    const checkUrl = `${API_BASE}/api/check`;
+    console.log('🔍 检查 API 状态，URL:', checkUrl);
+    
     try {
-        const response = await fetch(`${API_BASE}/api/check`);
+        const response = await fetch(checkUrl);
+        console.log('📡 API 检查响应状态:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const data = await response.json();
+        console.log('📦 API 检查响应数据:', data);
         
         apiKeyConfigured = data.configured;
         updateAPIStatusUI(data.configured, data.message);
         
     } catch (error) {
+        console.error('❌ API 状态检查失败:', error);
         // 在 Vercel 环境下，即使检查失败也允许尝试发送（可能是网络问题）
         if (isLocalDev) {
             apiKeyConfigured = false;
@@ -154,39 +187,51 @@ function saveChatHistory() {
 function bindAIEvents() {
     // 检查元素是否存在
     if (!toggleAIBtn) {
-        console.error('AI 按钮元素未找到');
+        console.error('❌ AI 按钮元素未找到，无法绑定事件');
         return;
     }
     if (!aiSidebar) {
-        console.error('AI 侧边栏元素未找到');
+        console.error('❌ AI 侧边栏元素未找到，无法绑定事件');
         return;
     }
     
-    console.log('绑定 AI 事件监听器');
+    console.log('🔗 绑定 AI 事件监听器');
     
     // 打开/关闭AI侧边栏
     toggleAIBtn.addEventListener('click', toggleAISidebar);
-    closeAIBtn.addEventListener('click', closeAISidebar);
+    if (closeAIBtn) {
+        closeAIBtn.addEventListener('click', closeAISidebar);
+    }
     
     // 发送消息
-    sendAIBtn.addEventListener('click', sendMessage);
+    if (sendAIBtn) {
+        sendAIBtn.addEventListener('click', sendMessage);
+    }
     
     // 回车发送（Shift+Enter换行）
-    aiInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
+    if (aiInput) {
+        aiInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
     
     // 设置弹窗
-    openSettingsBtn.addEventListener('click', openSettings);
-    closeSettingsBtn.addEventListener('click', closeSettings);
-    saveSettingsBtn.addEventListener('click', () => {
-        saveConfig();
-        closeSettings();
-        showToast('设置已保存');
-    });
+    if (openSettingsBtn) {
+        openSettingsBtn.addEventListener('click', openSettings);
+    }
+    if (closeSettingsBtn) {
+        closeSettingsBtn.addEventListener('click', closeSettings);
+    }
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', () => {
+            saveConfig();
+            closeSettings();
+            showToast('设置已保存');
+        });
+    }
     
     // 刷新状态按钮
     const refreshBtn = document.getElementById('refreshStatus');
@@ -198,10 +243,12 @@ function bindAIEvents() {
     }
     
     // 点击遮罩关闭弹窗
-    overlay.addEventListener('click', () => {
-        closeSettings();
-        closeAISidebar();
-    });
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            closeSettings();
+            closeAISidebar();
+        });
+    }
 }
 
 // ==================== UI控制函数 ====================
@@ -214,19 +261,32 @@ function toggleAISidebar(e) {
         e.preventDefault();
         e.stopPropagation();
     }
-    console.log('点击了 AI 按钮，当前状态:', aiSidebar.classList.contains('active'));
+    
+    console.log('🔵 点击了 AI 按钮');
+    console.log('📍 当前环境:', isLocalDev ? '本地开发' : 'Vercel 生产环境');
+    console.log('📍 API 地址:', API_BASE || '相对路径（Vercel）');
+    
     if (!aiSidebar) {
-        console.error('AI 侧边栏元素未找到');
+        console.error('❌ AI 侧边栏元素未找到！请检查 HTML 中是否有 id="aiSidebar" 的元素');
+        alert('AI 侧边栏元素未找到，请检查控制台错误信息');
         return;
     }
+    
+    const wasActive = aiSidebar.classList.contains('active');
     aiSidebar.classList.toggle('active');
-    console.log('切换后状态:', aiSidebar.classList.contains('active'));
-    if (aiSidebar.classList.contains('active')) {
+    const isNowActive = aiSidebar.classList.contains('active');
+    
+    console.log('📊 状态变化:', wasActive ? '打开' : '关闭', '→', isNowActive ? '打开' : '关闭');
+    
+    if (isNowActive) {
+        console.log('✅ AI 侧边栏已打开');
         if (aiInput) {
             aiInput.focus();
         }
         // 打开时检查状态
         checkAPIStatus();
+    } else {
+        console.log('❌ AI 侧边栏已关闭');
     }
 }
 
@@ -261,6 +321,10 @@ function closeSettings() {
  * 发送消息
  */
 async function sendMessage() {
+    if (!aiInput) {
+        console.error('❌ 输入框元素未找到');
+        return;
+    }
     const message = aiInput.value.trim();
     if (!message) return;
     
@@ -283,7 +347,9 @@ async function sendMessage() {
     const loadingId = showLoading();
     
     // 禁用发送按钮
-    sendAIBtn.disabled = true;
+    if (sendAIBtn) {
+        sendAIBtn.disabled = true;
+    }
     
     try {
         // 通过本地服务器调用API
@@ -311,7 +377,9 @@ async function sendMessage() {
     }
     
     // 重新启用发送按钮
-    sendAIBtn.disabled = false;
+    if (sendAIBtn) {
+        sendAIBtn.disabled = false;
+    }
 }
 
 /**
@@ -374,6 +442,10 @@ async function callQwenAPI(userMessage) {
  * @param {string} content - 消息内容
  */
 function addMessageToUI(role, content) {
+    if (!aiMessages) {
+        console.error('❌ 消息容器元素未找到');
+        return;
+    }
     // 移除欢迎消息（如果存在）
     const welcome = aiMessages.querySelector('.ai-welcome');
     if (welcome) {
@@ -402,6 +474,10 @@ function addMessageToUI(role, content) {
  * @returns {string} 加载元素的ID
  */
 function showLoading() {
+    if (!aiMessages) {
+        console.error('❌ 消息容器元素未找到');
+        return null;
+    }
     const loadingId = 'loading-' + Date.now();
     const loadingDiv = document.createElement('div');
     loadingDiv.id = loadingId;
@@ -437,6 +513,10 @@ function removeLoading(loadingId) {
  * 渲染对话历史
  */
 function renderChatHistory() {
+    if (!aiMessages) {
+        console.error('❌ 消息容器元素未找到');
+        return;
+    }
     // 清空现有消息（保留欢迎消息的容器）
     const welcome = aiMessages.querySelector('.ai-welcome');
     aiMessages.innerHTML = '';
