@@ -141,12 +141,39 @@ notepad C:\Windows\System32\drivers\etc\hosts
 ```
 
 ### 推荐解决流程
-1. **首先尝试**：使用 GitHub Desktop（最简单可靠）
-2. **如果必须用命令行**：
+1. **首先尝试**：增加 Git 超时配置（最简单，通常能解决）
+2. **如果还不行**：
    - 检查是否有代理，配置代理
    - 尝试使用 SSH
-   - 增加超时配置
+   - 使用 GitHub Desktop
 3. **最后手段**：使用 GitHub 网页上传
+
+### 实际成功案例
+**问题**：`Failed to connect to github.com port 443 after 21093 ms`
+
+**解决步骤**：
+```powershell
+# 1. 增加 Git 超时和缓冲区配置
+git config --global http.timeout 300
+git config --global http.postBuffer 524288000
+git config --global http.lowSpeedLimit 0
+git config --global http.lowSpeedTime 999999
+
+# 2. 重试推送
+git push
+```
+
+**结果**：✅ 推送成功
+```
+Writing objects: 100% (6/6), 6.32 KiB | 539.00 KiB/s, done.
+To https://github.com/Leo808918/weather.git
+   afef8c8..03f55fd  main -> main
+```
+
+**注意**：如果看到 `git: 'credential-manager-core' is not a git command` 警告，可以忽略，不影响推送。如果想移除警告：
+```powershell
+git config --global --unset credential.helper
+```
 
 ### 临时解决方案
 如果急需推送代码，可以：
