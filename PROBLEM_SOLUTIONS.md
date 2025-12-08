@@ -64,28 +64,95 @@ async function saveEntriesToStorage() {
 ### 问题描述
 - `fatal: unable to access 'https://github.com/...': Recv failure: Connection was reset`
 - `fatal: unable to access 'https://github.com/...': Empty reply from server`
+- `Failed to connect to github.com port 443 after 21093 ms: Could not connect to server`
+
+### 原因分析
+1. **网络不稳定**：连接在传输过程中被重置
+2. **防火墙/代理问题**：公司网络或防火墙阻止了连接
+3. **GitHub 访问受限**：如果在国内，可能需要代理
+4. **DNS 解析问题**：无法正确解析 github.com 的 IP 地址
+5. **端口 443 被阻止**：HTTPS 连接被阻止
 
 ### 解决方案
-**方案 1：增加 Git 超时配置**
+
+#### 方案 1：检查网络连接
+```powershell
+# 测试 GitHub 连接
+ping github.com
+
+# 测试 HTTPS 连接
+curl -I https://github.com
+```
+
+#### 方案 2：配置代理（如果你使用代理）
+```powershell
+# 设置 HTTP 代理（替换为你的代理地址和端口）
+git config --global http.proxy http://127.0.0.1:7890
+git config --global https.proxy http://127.0.0.1:7890
+
+# 如果使用 SOCKS5 代理
+git config --global http.proxy socks5://127.0.0.1:1080
+git config --global https.proxy socks5://127.0.0.1:1080
+
+# 取消代理（如果不需要）
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
+
+#### 方案 3：增加 Git 超时和缓冲区配置
 ```powershell
 git config --global http.postBuffer 524288000
 git config --global http.lowSpeedLimit 0
 git config --global http.lowSpeedTime 999999
+git config --global http.timeout 300
 ```
 
-**方案 2：使用 SSH（如果已配置）**
+#### 方案 4：使用 SSH（推荐，如果已配置 SSH 密钥）
 ```powershell
+# 切换为 SSH 协议
 git remote set-url origin git@github.com:Leo808918/weather.git
+
+# 测试 SSH 连接
+ssh -T git@github.com
+
+# 推送
 git push
 ```
 
-**方案 3：使用 GitHub Desktop 或网页上传**
+#### 方案 5：使用 GitHub Desktop（最简单）
+1. 下载安装 [GitHub Desktop](https://desktop.github.com/)
+2. 登录你的 GitHub 账号
+3. 添加本地仓库
+4. 点击 Push 按钮
 
-### 最终解决
-使用 GitHub Desktop 或配置 Git Credential Manager：
+#### 方案 6：使用 GitHub 网页上传
+1. 在 GitHub 网页上创建文件
+2. 或者使用 GitHub 的网页编辑器
+3. 直接复制粘贴代码
+
+#### 方案 7：修改 hosts 文件（如果在国内）
 ```powershell
-git config --global credential.helper manager-core
+# 编辑 hosts 文件（需要管理员权限）
+notepad C:\Windows\System32\drivers\etc\hosts
+
+# 添加以下内容（IP 地址可能会变，需要查询最新 IP）
+140.82.112.3 github.com
+140.82.112.4 github.com
 ```
+
+### 推荐解决流程
+1. **首先尝试**：使用 GitHub Desktop（最简单可靠）
+2. **如果必须用命令行**：
+   - 检查是否有代理，配置代理
+   - 尝试使用 SSH
+   - 增加超时配置
+3. **最后手段**：使用 GitHub 网页上传
+
+### 临时解决方案
+如果急需推送代码，可以：
+1. 将代码打包成 zip 文件
+2. 在 GitHub 网页上创建新文件
+3. 或者使用 GitHub Desktop
 
 ---
 
