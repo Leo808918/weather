@@ -2,8 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/*.py",
-      "use": "@vercel/python"
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
     },
     {
       "src": "*.html",
@@ -21,15 +21,15 @@
   "routes": [
     {
       "src": "/api/chat",
-      "dest": "/api/chat.py"
+      "dest": "/api/chat.js"
     },
     {
       "src": "/api/check",
-      "dest": "/api/check.py"
+      "dest": "/api/check.js"
     },
     {
       "src": "/api/entries",
-      "dest": "/api/entries.py"
+      "dest": "/api/entries.js"
     },
     {
       "src": "/(.*)",
@@ -37,4 +37,3 @@
     }
   ]
 }
-
