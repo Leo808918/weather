@@ -188,15 +188,13 @@ function saveChatHistory() {
 function bindAIEvents() {
     // 检查元素是否存在
     if (!toggleAIBtn) {
-        console.error('❌ AI 按钮元素未找到，无法绑定事件');
+        console.error('AI 按钮元素未找到，无法绑定事件');
         return;
     }
     if (!aiSidebar) {
-        console.error('❌ AI 侧边栏元素未找到，无法绑定事件');
+        console.error('AI 侧边栏元素未找到，无法绑定事件');
         return;
     }
-    
-    console.log('🔗 绑定 AI 事件监听器');
     
     // 打开/关闭AI侧边栏
     toggleAIBtn.addEventListener('click', toggleAISidebar);
@@ -263,31 +261,19 @@ function toggleAISidebar(e) {
         e.stopPropagation();
     }
     
-    console.log('🔵 点击了 AI 按钮');
-    console.log('📍 当前环境:', isLocalDev ? '本地开发' : 'Vercel 生产环境');
-    console.log('📍 API 地址:', API_BASE || '相对路径（Vercel）');
-    
     if (!aiSidebar) {
-        console.error('❌ AI 侧边栏元素未找到！请检查 HTML 中是否有 id="aiSidebar" 的元素');
-        alert('AI 侧边栏元素未找到，请检查控制台错误信息');
+        console.error('AI 侧边栏元素未找到，请检查 HTML 中是否有 id="aiSidebar" 的元素');
         return;
     }
     
-    const wasActive = aiSidebar.classList.contains('active');
     aiSidebar.classList.toggle('active');
-    const isNowActive = aiSidebar.classList.contains('active');
     
-    console.log('📊 状态变化:', wasActive ? '打开' : '关闭', '→', isNowActive ? '打开' : '关闭');
-    
-    if (isNowActive) {
-        console.log('✅ AI 侧边栏已打开');
+    if (aiSidebar.classList.contains('active')) {
         if (aiInput) {
             aiInput.focus();
         }
         // 打开时检查状态
         checkAPIStatus();
-    } else {
-        console.log('❌ AI 侧边栏已关闭');
     }
 }
 
@@ -323,7 +309,7 @@ function closeSettings() {
  */
 async function sendMessage() {
     if (!aiInput) {
-        console.error('❌ 输入框元素未找到');
+        console.error('输入框元素未找到');
         return;
     }
     const message = aiInput.value.trim();
