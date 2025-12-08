@@ -19,9 +19,13 @@ let entries = [];
 // 当前正在编辑的日志ID
 let currentEntryId = null;
 
-// 自动检测 API 服务器地址
-const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const API_BASE = isLocalDev ? 'http://localhost:8000' : '';
+// 自动检测 API 服务器地址（使用 window 对象避免重复声明）
+if (!window.isLocalDev) {
+    window.isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    window.API_BASE = window.isLocalDev ? 'http://localhost:8000' : '';
+}
+const isLocalDev = window.isLocalDev;
+const API_BASE = window.API_BASE;
 
 // 是否使用服务器存储（本地环境使用服务器存储，Vercel环境使用localStorage）
 let useServerStorage = isLocalDev;

@@ -22,10 +22,13 @@ let apiConfig = {
 // API Key 状态
 let apiKeyConfigured = false;
 
-// 自动检测 API 服务器地址
-// 如果是本地开发（localhost），使用本地服务器；否则使用相对路径（Vercel）
-const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const API_BASE = isLocalDev ? 'http://localhost:8000' : '';
+// 自动检测 API 服务器地址（使用 window 对象避免重复声明）
+if (!window.isLocalDev) {
+    window.isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    window.API_BASE = window.isLocalDev ? 'http://localhost:8000' : '';
+}
+const isLocalDev = window.isLocalDev;
+const API_BASE = window.API_BASE;
 
 // ==================== DOM元素引用 ====================
 

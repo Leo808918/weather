@@ -11,6 +11,22 @@ def handler(request):
     处理日志数据请求
     在 Vercel 环境下，返回提示信息，让前端使用 localStorage
     """
+    # 获取请求方法
+    method = request.get('method', 'GET')
+    
+    # 处理 CORS 预检请求
+    if method == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            },
+            'body': ''
+        }
+    
+    # 返回提示信息，让前端使用 localStorage
     return {
         'statusCode': 200,
         'headers': {
@@ -25,4 +41,3 @@ def handler(request):
             'message': 'Vercel 环境下请使用本地存储'
         })
     }
-
