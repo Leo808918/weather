@@ -13,7 +13,7 @@ def handler(request):
     处理 AI 对话请求
     Vercel Serverless Function 入口
     """
-    # Vercel 传递的 request 是一个字典
+    # 获取请求方法和请求体
     method = request.get('method', 'GET')
     body = request.get('body', '')
     
