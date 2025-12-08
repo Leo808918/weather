@@ -490,4 +490,10 @@ function showToast(message) {
 
 // ==================== 启动应用 ====================
 
-document.addEventListener('DOMContentLoaded', init);
+// 如果 DOM 已经加载完成，直接初始化；否则等待 DOMContentLoaded 事件
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    // DOM 已经加载完成，直接初始化
+    init();
+}

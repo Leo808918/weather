@@ -38,6 +38,7 @@ let settingsModal, openSettingsBtn, closeSettingsBtn, saveSettingsBtn;
 let apiKeyStatus, modelSelect, overlay;
 
 function getDOMElements() {
+    console.log('🔍 开始获取 DOM 元素...');
     aiSidebar = document.getElementById('aiSidebar');
     aiMessages = document.getElementById('aiMessages');
     aiInput = document.getElementById('aiInput');
@@ -52,6 +53,14 @@ function getDOMElements() {
     apiKeyStatus = document.getElementById('apiKeyStatus');
     modelSelect = document.getElementById('modelSelect');
     overlay = document.getElementById('overlay');
+    
+    // 调试：检查关键元素
+    console.log('📋 DOM 元素检查结果:');
+    console.log('  - toggleAIBtn:', toggleAIBtn ? '✅' : '❌');
+    console.log('  - aiSidebar:', aiSidebar ? '✅' : '❌');
+    console.log('  - aiMessages:', aiMessages ? '✅' : '❌');
+    console.log('  - aiInput:', aiInput ? '✅' : '❌');
+    console.log('  - sendAIBtn:', sendAIBtn ? '✅' : '❌');
 }
 
 // ==================== 初始化函数 ====================
@@ -538,4 +547,10 @@ function renderChatHistory() {
 // ==================== 启动AI模块 ====================
 
 // 页面加载完成后初始化AI模块
-document.addEventListener('DOMContentLoaded', initAI);
+// 如果 DOM 已经加载完成，直接初始化；否则等待 DOMContentLoaded 事件
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAI);
+} else {
+    // DOM 已经加载完成，直接初始化
+    initAI();
+}
