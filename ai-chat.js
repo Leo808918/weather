@@ -38,7 +38,6 @@ let settingsModal, openSettingsBtn, closeSettingsBtn, saveSettingsBtn;
 let apiKeyStatus, modelSelect, overlay;
 
 function getDOMElements() {
-    console.log('🔍 开始获取 DOM 元素...');
     aiSidebar = document.getElementById('aiSidebar');
     aiMessages = document.getElementById('aiMessages');
     aiInput = document.getElementById('aiInput');
@@ -53,14 +52,6 @@ function getDOMElements() {
     apiKeyStatus = document.getElementById('apiKeyStatus');
     modelSelect = document.getElementById('modelSelect');
     overlay = document.getElementById('overlay');
-    
-    // 调试：检查关键元素
-    console.log('📋 DOM 元素检查结果:');
-    console.log('  - toggleAIBtn:', toggleAIBtn ? '✅' : '❌');
-    console.log('  - aiSidebar:', aiSidebar ? '✅' : '❌');
-    console.log('  - aiMessages:', aiMessages ? '✅' : '❌');
-    console.log('  - aiInput:', aiInput ? '✅' : '❌');
-    console.log('  - sendAIBtn:', sendAIBtn ? '✅' : '❌');
 }
 
 // ==================== 初始化函数 ====================
@@ -74,15 +65,13 @@ function initAI() {
     
     // 检查关键元素是否存在
     if (!toggleAIBtn) {
-        console.error('❌ AI 按钮元素未找到，请检查 HTML 结构');
+        console.error('AI 按钮元素未找到，请检查 HTML 结构');
         return;
     }
     if (!aiSidebar) {
-        console.error('❌ AI 侧边栏元素未找到，请检查 HTML 结构');
+        console.error('AI 侧边栏元素未找到，请检查 HTML 结构');
         return;
     }
-    
-    console.log('✅ AI 模块初始化成功');
     
     // 加载保存的配置
     loadConfig();
