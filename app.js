@@ -493,6 +493,28 @@ function debounce(func, wait) {
 }
 
 /**
+ * 显示存储状态提示
+ */
+function showStorageStatus(type, message) {
+    const statusEl = document.getElementById('storageStatus');
+    if (!statusEl) return;
+    
+    statusEl.style.display = 'block';
+    statusEl.className = `storage-status storage-${type}`;
+    statusEl.textContent = message;
+}
+
+/**
+ * 隐藏存储状态提示
+ */
+function hideStorageStatus() {
+    const statusEl = document.getElementById('storageStatus');
+    if (statusEl) {
+        statusEl.style.display = 'none';
+    }
+}
+
+/**
  * 显示提示消息
  */
 function showToast(message) {
