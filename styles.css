@@ -749,6 +749,41 @@ body {
     margin-bottom: 8px;
 }
 
+/* ==================== 存储状态提示 ==================== */
+
+.storage-status {
+    padding: 8px 12px;
+    margin: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+}
+
+.storage-status.storage-local {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+}
+
+.storage-status.storage-server {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #28a745;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+}
+
 .help-text p:last-child {
     margin-bottom: 0;
 }
