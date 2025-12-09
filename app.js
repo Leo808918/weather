@@ -67,26 +67,49 @@ async function init() {
  * 从服务器加载日志数据
  */
 async function loadEntries() {
-    try {
-        const response = await fetch(`${API_BASE}/api/entries`);
-        const data = await response.json();
-        
-        if (data.success) {
-            entries = data.entries || [];
-            useServerStorage = true;
-            console.log('✅ 从服务器加载数据成功');
-        } else {
-            throw new Error('服务器返回错误');
+    // 如果是本地环境，尝试连接服务器；否则直接使用 localStorage
+    if (isLocalDev) {
+        try {
+            const response = await fetch(`${API_BASE}/api/entries`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`服务器响应错误: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                entries = data.entries || [];
+                useServerStorage = true;
+                console.log('✅ 从服务器加载数据成功');
+                hideStorageStatus();
+            } else {
+                throw new Error('服务器返回错误');
+            }
+        } catch (error) {
+            console.warn('⚠️ 无法连接服务器，使用本地存储:', error.message);
+            useServerStorage = false;
+            showStorageStatus('local', '使用本地存储（服务器未连接）');
+            
+            // 回退到localStorage
+            const savedEntries = localStorage.getItem('journal_entries');
+            if (savedEntries) {
+                entries = JSON.parse(savedEntries);
+            }
         }
-    } catch (error) {
-        console.warn('⚠️ 无法连接服务器，使用本地存储:', error.message);
+    } else {
+        // Vercel 环境直接使用 localStorage
         useServerStorage = false;
-        
-        // 回退到localStorage
         const savedEntries = localStorage.getItem('journal_entries');
         if (savedEntries) {
             entries = JSON.parse(savedEntries);
         }
+        hideStorageStatus();
     }
 }
 
