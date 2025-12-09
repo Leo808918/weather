@@ -312,10 +312,24 @@
     
     async function callAPI(userMessage) {
         const recentHistory = chatHistory.slice(-20);
+        
+        // 根据选择的模型动态生成系统提示词
+        let systemPrompt;
+        if (apiConfig.model.startsWith('deepseek')) {
+            if (apiConfig.model === 'deepseek-coder') {
+                systemPrompt = '你是 DeepSeek Coder，一个专门用于代码相关任务的AI助手。你可以帮助用户编写代码、调试程序、解释代码逻辑、优化代码性能等。请用简洁清晰的中文回答。';
+            } else {
+                systemPrompt = '你是 DeepSeek，一个友好的AI助手。你可以帮助用户整理想法、回答问题、提供建议。请用简洁清晰的中文回答。';
+            }
+        } else {
+            // 通义千问模型
+            systemPrompt = '你是阿里云的通义千问AI助手。你可以帮助用户整理想法、回答问题、提供建议。请用简洁清晰的中文回答。';
+        }
+        
         const messages = [
             {
                 role: 'system',
-                content: '你是一个友好的AI助手，可以帮助用户整理想法、回答问题、提供建议。请用简洁清晰的中文回答。'
+                content: systemPrompt
             },
             ...recentHistory,
             {
