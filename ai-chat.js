@@ -81,6 +81,9 @@
         loadConfig();
         loadConversations();
         
+        // 同步模型选择器
+        syncModelSelectors();
+        
         // 绑定事件
         bindEvents();
         
@@ -107,11 +110,18 @@
     }
     
     function saveConfig() {
+        localStorage.setItem('ai_config', JSON.stringify(apiConfig));
+        syncModelSelectors();
+    }
+    
+    function syncModelSelectors() {
         const el = getElements();
         if (el.modelSelect) {
-            apiConfig.model = el.modelSelect.value;
+            el.modelSelect.value = apiConfig.model;
         }
-        localStorage.setItem('ai_config', JSON.stringify(apiConfig));
+        if (el.quickModelSelect) {
+            el.quickModelSelect.value = apiConfig.model;
+        }
     }
     
     // ==================== 对话会话管理 ====================
@@ -302,6 +312,10 @@
         }
         if (el.saveSettingsBtn) {
             el.saveSettingsBtn.addEventListener('click', () => {
+                const el = getElements();
+                if (el.modelSelect) {
+                    apiConfig.model = el.modelSelect.value;
+                }
                 saveConfig();
                 closeSettings();
                 showToast('设置已保存');
@@ -324,6 +338,22 @@
                     sidebar.classList.toggle('collapsed');
                     const btn = el.toggleChatList;
                     btn.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+                }
+            });
+        }
+        
+        // 快速模型选择器
+        if (el.quickModelSelect) {
+            el.quickModelSelect.addEventListener('change', () => {
+                const newModel = el.quickModelSelect.value;
+                if (newModel !== apiConfig.model) {
+                    apiConfig.model = newModel;
+                    // 同步到设置中的模型选择器
+                    if (el.modelSelect) {
+                        el.modelSelect.value = newModel;
+                    }
+                    saveConfig();
+                    showToast(`已切换到 ${newModel}`);
                 }
             });
         }
