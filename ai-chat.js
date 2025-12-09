@@ -159,21 +159,9 @@
         }
         if (el.saveSettingsBtn) {
             el.saveSettingsBtn.addEventListener('click', () => {
-                const el = getElements();
-                const newModel = el.modelSelect ? el.modelSelect.value : 'qwen-turbo';
-                const oldModel = apiConfig.model;
-                
-                // 如果模型改变了，清空对话历史
-                if (newModel !== oldModel) {
-                    clearChatHistory();
-                    showToast('模型已切换，已开启新对话');
-                }
-                
                 saveConfig();
                 closeSettings();
-                if (newModel === oldModel) {
-                    showToast('设置已保存');
-                }
+                showToast('设置已保存');
             });
         }
         
