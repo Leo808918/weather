@@ -38,6 +38,7 @@
                 sendAIBtn: document.getElementById('sendAI'),
                 toggleAIBtn: document.getElementById('toggleAI'),
                 closeAIBtn: document.getElementById('closeAI'),
+                newChatBtn: document.getElementById('newChatBtn'),
                 settingsModal: document.getElementById('settingsModal'),
                 openSettingsBtn: document.getElementById('openSettings'),
                 closeSettingsBtn: document.getElementById('closeSettings'),
@@ -158,9 +159,35 @@
         }
         if (el.saveSettingsBtn) {
             el.saveSettingsBtn.addEventListener('click', () => {
+                const el = getElements();
+                const newModel = el.modelSelect ? el.modelSelect.value : 'qwen-turbo';
+                const oldModel = apiConfig.model;
+                
+                // 如果模型改变了，清空对话历史
+                if (newModel !== oldModel) {
+                    clearChatHistory();
+                    showToast('模型已切换，已开启新对话');
+                }
+                
                 saveConfig();
                 closeSettings();
-                showToast('设置已保存');
+                if (newModel === oldModel) {
+                    showToast('设置已保存');
+                }
+            });
+        }
+        
+        // 新对话按钮
+        if (el.newChatBtn) {
+            el.newChatBtn.addEventListener('click', () => {
+                if (chatHistory.length > 0) {
+                    if (confirm('确定要开始新对话吗？当前对话历史将被清空。')) {
+                        clearChatHistory();
+                        showToast('已开启新对话');
+                    }
+                } else {
+                    showToast('当前没有对话历史');
+                }
             });
         }
         
@@ -420,16 +447,30 @@
         const el = getElements();
         if (!el.aiMessages) return;
         
-        const welcome = el.aiMessages.querySelector('.ai-welcome');
+        // 清空消息区域
         el.aiMessages.innerHTML = '';
         
-        if (chatHistory.length > 0) {
-            chatHistory.forEach(msg => {
-                addMessage(msg.role, msg.content);
-            });
-        } else if (welcome) {
-            el.aiMessages.appendChild(welcome);
+        // 如果没有历史记录，显示欢迎消息
+        if (chatHistory.length === 0) {
+            let welcomeText = '';
+            if (apiConfig.model.startsWith('deepseek')) {
+                if (apiConfig.model === 'deepseek-coder') {
+                    welcomeText = '<p>你好！我是 DeepSeek Coder，专门用于代码相关任务。</p><p>我可以帮你编写代码、调试程序、解释代码逻辑等。</p>';
+                } else {
+                    welcomeText = '<p>你好！我是 DeepSeek AI助手。</p><p>你可以问我任何问题，或者让我帮你整理日志内容。</p>';
+                }
+            } else {
+                welcomeText = '<p>你好！我是阿里云的通义千问AI助手。</p><p>你可以问我任何问题，或者让我帮你整理日志内容。</p>';
+            }
+            
+            el.aiMessages.innerHTML = `<div class="ai-welcome">${welcomeText}</div>`;
+            return;
         }
+        
+        // 渲染历史消息
+        chatHistory.forEach(msg => {
+            addMessage(msg.role, msg.content);
+        });
     }
     
     // ==================== 工具函数 ====================
@@ -448,6 +489,17 @@
         setTimeout(() => {
             toast.classList.remove('show');
         }, 2000);
+    }
+    
+    // ==================== 工具函数 ====================
+    
+    /**
+     * 清空对话历史
+     */
+    function clearChatHistory() {
+        chatHistory = [];
+        saveChatHistory();
+        renderChatHistory();
     }
     
     // ==================== 启动 ====================
