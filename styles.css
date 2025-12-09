@@ -526,9 +526,37 @@ body {
     justify-content: space-between;
 }
 
+.ai-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
 .ai-header h3 {
     font-size: 1.1rem;
     font-weight: 600;
+    margin: 0;
+}
+
+.btn-expand-chat-list {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.btn-expand-chat-list:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
 }
 
 .ai-header-actions {

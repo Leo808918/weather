@@ -46,6 +46,7 @@
                 chatList: document.getElementById('chatList'),
                 chatListSidebar: document.getElementById('chatListSidebar'),
                 toggleChatList: document.getElementById('toggleChatList'),
+                expandChatList: document.getElementById('expandChatList'),
                 currentChatTitle: document.getElementById('currentChatTitle'),
                 quickModelSelect: document.getElementById('quickModelSelect'),
                 settingsModal: document.getElementById('settingsModal'),
