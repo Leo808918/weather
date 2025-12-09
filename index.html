@@ -16,19 +16,11 @@
             <div class="header-actions">
                 <!-- AI对话按钮 -->
                 <button class="btn-icon" id="toggleAI" title="AI助手">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/>
-                        <circle cx="8" cy="10" r="1.5" fill="currentColor"/>
-                        <circle cx="16" cy="10" r="1.5" fill="currentColor"/>
-                        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-                    </svg>
+                    <img src="picture/ai.png" alt="AI助手" class="icon-img">
                 </button>
                 <!-- 设置按钮 -->
                 <button class="btn-icon" id="openSettings" title="设置">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
-                    </svg>
+                    <img src="picture/setting.png" alt="设置" class="icon-img">
                 </button>
             </div>
         </header>
@@ -101,6 +93,7 @@
 
     <!-- ==================== AI对话侧边栏 ==================== -->
     <div class="ai-sidebar" id="aiSidebar">
+        <div class="ai-sidebar-drag-handle" id="aiSidebarDragHandle"></div>
         <!-- 对话列表侧边栏 -->
         <div class="chat-list-sidebar" id="chatListSidebar">
             <div class="chat-list-header">

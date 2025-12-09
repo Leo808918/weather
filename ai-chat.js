@@ -47,6 +47,7 @@
                 chatListSidebar: document.getElementById('chatListSidebar'),
                 toggleChatList: document.getElementById('toggleChatList'),
                 expandChatList: document.getElementById('expandChatList'),
+                aiSidebarDragHandle: document.getElementById('aiSidebarDragHandle'),
                 currentChatTitle: document.getElementById('currentChatTitle'),
                 quickModelSelect: document.getElementById('quickModelSelect'),
                 settingsModal: document.getElementById('settingsModal'),
@@ -383,6 +384,50 @@
                     el.expandChatList.style.display = 'none';
                 }
             });
+        }
+        
+        // AI侧边栏拖动功能
+        if (el.aiSidebarDragHandle && el.aiSidebar) {
+            let isDragging = false;
+            let startX = 0;
+            let startWidth = 0;
+            
+            el.aiSidebarDragHandle.addEventListener('mousedown', (e) => {
+                if (!el.aiSidebar.classList.contains('active')) return;
+                
+                isDragging = true;
+                startX = e.clientX;
+                startWidth = el.aiSidebar.offsetWidth;
+                el.aiSidebar.classList.add('dragging');
+                document.body.style.cursor = 'ew-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const diff = startX - e.clientX; // 向右拖动时减小宽度
+                const newWidth = Math.max(300, Math.min(90 * window.innerWidth / 100, startWidth + diff));
+                el.aiSidebar.style.width = newWidth + 'px';
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    el.aiSidebar.classList.remove('dragging');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                    // 保存宽度到 localStorage
+                    localStorage.setItem('ai_sidebar_width', el.aiSidebar.style.width);
+                }
+            });
+            
+            // 加载保存的宽度
+            const savedWidth = localStorage.getItem('ai_sidebar_width');
+            if (savedWidth) {
+                el.aiSidebar.style.width = savedWidth;
+            }
         }
         
         // 快速模型选择器

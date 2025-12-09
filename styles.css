@@ -93,6 +93,13 @@ body {
     color: var(--accent-color);
 }
 
+.btn-icon .icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+}
+
 /* ==================== 
    主内容区域布局 
    ==================== */
@@ -352,17 +359,73 @@ body {
     right: -600px;
     top: 0;
     width: 600px;
+    min-width: 300px;
+    max-width: 90vw;
     height: 100vh;
     background: var(--bg-secondary);
     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: row;
-    transition: right 0.3s ease;
+    transition: right 0.3s ease, width 0s ease;
     z-index: 200;
+    cursor: default;
+    user-select: none;
 }
 
 .ai-sidebar.active {
     right: 0;
+}
+
+.ai-sidebar.dragging {
+    transition: none;
+    cursor: ew-resize;
+}
+
+/* 拖动条 */
+.ai-sidebar-drag-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    cursor: ew-resize;
+    z-index: 10;
+    transition: background 0.2s ease;
+}
+
+.ai-sidebar-drag-handle:hover {
+    background: var(--accent-color);
+}
+
+.ai-sidebar.dragging .ai-sidebar-drag-handle {
+    background: var(--accent-color);
+}
+
+.ai-sidebar.dragging {
+    transition: none;
+    cursor: ew-resize;
+}
+
+/* 拖动条 */
+.ai-sidebar-drag-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    cursor: ew-resize;
+    z-index: 10;
+    transition: background 0.2s ease;
+}
+
+.ai-sidebar-drag-handle:hover {
+    background: var(--accent-color);
+}
+
+.ai-sidebar.dragging .ai-sidebar-drag-handle {
+    background: var(--accent-color);
 }
 
 /* 对话列表侧边栏 */
@@ -606,7 +669,27 @@ body {
 .ai-messages {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.ai-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ai-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ai-messages::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.ai-messages::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
 }
 
 .ai-welcome {
