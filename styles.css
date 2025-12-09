@@ -673,10 +673,14 @@ body {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
     font-size: 0.9rem;
-    resize: none;
+    resize: vertical;
+    min-height: 44px;
+    max-height: 200px;
     outline: none;
     font-family: inherit;
     width: 100%;
+    overflow-y: auto;
+    line-height: 1.5;
 }
 
 .ai-input-area textarea:focus {
@@ -1026,7 +1030,7 @@ body {
         transform: translateY(0);
     }
 }
-}
+
 
 .help-text p:last-child {
     margin-bottom: 0;

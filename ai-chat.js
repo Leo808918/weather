@@ -88,8 +88,22 @@
         // 绑定事件
         bindEvents();
         
+        // 初始化展开按钮状态
+        initExpandButtonState();
+        
         // 检查 API 状态
         checkAPIStatus();
+    }
+    
+    // ==================== UI 初始化 ====================
+    
+    function initExpandButtonState() {
+        const el = getElements();
+        if (el.chatListSidebar && el.expandChatList) {
+            // 如果对话列表是收起状态，显示展开按钮
+            const isCollapsed = el.chatListSidebar.classList.contains('collapsed');
+            el.expandChatList.style.display = isCollapsed ? 'flex' : 'none';
+        }
     }
     
     // ==================== 配置管理 ====================
@@ -157,11 +171,14 @@
             if (conv) {
                 conv.messages = chatHistory;
                 conv.updatedAt = new Date().toISOString();
-                // 如果没有标题且有消息，生成标题
-                if (!conv.title || conv.title === '新对话') {
+                // 如果没有标题且有消息，生成标题（只生成一次，避免覆盖）
+                if (conv.title === '新对话' && chatHistory.length > 0) {
                     const firstUserMsg = chatHistory.find(m => m.role === 'user');
                     if (firstUserMsg) {
-                        conv.title = firstUserMsg.content.substring(0, 30) || '新对话';
+                        const newTitle = firstUserMsg.content.trim().substring(0, 30);
+                        if (newTitle) {
+                            conv.title = newTitle;
+                        }
                     }
                 }
             }
@@ -184,6 +201,7 @@
         saveConversations();
         renderChatList();
         renderChatHistory();
+        updateChatTitle(); // 更新标题显示
     }
     
     function loadConversation(conversationId) {
@@ -296,6 +314,12 @@
             el.sendAIBtn.addEventListener('click', sendMessage);
         }
         if (el.aiInput) {
+            // 自动调整输入框高度
+            el.aiInput.addEventListener('input', () => {
+                el.aiInput.style.height = 'auto';
+                el.aiInput.style.height = Math.min(el.aiInput.scrollHeight, 200) + 'px';
+            });
+            
             el.aiInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -339,6 +363,24 @@
                     sidebar.classList.toggle('collapsed');
                     const btn = el.toggleChatList;
                     btn.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+                    // 显示/隐藏展开按钮
+                    if (el.expandChatList) {
+                        el.expandChatList.style.display = sidebar.classList.contains('collapsed') ? 'flex' : 'none';
+                    }
+                }
+            });
+        }
+        
+        // 展开对话列表
+        if (el.expandChatList) {
+            el.expandChatList.addEventListener('click', () => {
+                const sidebar = el.chatListSidebar;
+                if (sidebar && sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.remove('collapsed');
+                    if (el.toggleChatList) {
+                        el.toggleChatList.textContent = '◀';
+                    }
+                    el.expandChatList.style.display = 'none';
                 }
             });
         }
@@ -475,8 +517,9 @@
             return;
         }
         
-        // 清空输入
+        // 清空输入并重置高度
         el.aiInput.value = '';
+        el.aiInput.style.height = 'auto';
         
         // 显示用户消息
         addMessage('user', message);
@@ -495,6 +538,7 @@
             chatHistory.push({ role: 'assistant', content: response });
             saveConversations();
             renderChatList(); // 更新对话列表（可能更新标题）
+            updateChatTitle(); // 更新标题显示（如果生成了新标题）
         } catch (error) {
             removeLoading(loadingId);
             addMessage('assistant', `抱歉，发生错误：${error.message}`);
