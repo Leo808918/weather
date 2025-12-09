@@ -23,24 +23,43 @@ export default async function handler(req, res) {
         });
     }
 
-    // 获取环境变量中的 API Key
-    const apiKey = process.env.DASHSCOPE_API_KEY;
-
-    if (!apiKey) {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        return res.status(500).json({
-            error: {
-                message: '服务器未配置 API Key，请在 Vercel 环境变量中设置 DASHSCOPE_API_KEY',
-                code: 500
-            }
-        });
+    // 获取模型名称
+    const model = req.body?.model || 'qwen-turbo';
+    
+    // 判断使用哪个 API
+    let apiKey, apiUrl;
+    if (model.startsWith('deepseek')) {
+        // DeepSeek 模型
+        apiKey = process.env.DEEPSEEK_API_KEY;
+        apiUrl = 'https://api.deepseek.com/v1/chat/completions';
+        
+        if (!apiKey) {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            return res.status(500).json({
+                error: {
+                    message: '服务器未配置 DeepSeek API Key，请在 Vercel 环境变量中设置 DEEPSEEK_API_KEY',
+                    code: 500
+                }
+            });
+        }
+    } else {
+        // 通义千问模型
+        apiKey = process.env.DASHSCOPE_API_KEY;
+        apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+        
+        if (!apiKey) {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            return res.status(500).json({
+                error: {
+                    message: '服务器未配置 API Key，请在 Vercel 环境变量中设置 DASHSCOPE_API_KEY',
+                    code: 500
+                }
+            });
+        }
     }
 
     try {
-        // 通义千问 API 地址
-        const apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-
-        // 发送请求到通义千问
+        // 发送请求到相应的 API
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {

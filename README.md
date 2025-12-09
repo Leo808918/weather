@@ -80,20 +80,29 @@ weather/
 
 **Windows PowerShell (临时)**:
 ```powershell
-$env:DASHSCOPE_API_KEY="你的API Key"
+# 通义千问 API Key
+$env:DASHSCOPE_API_KEY="你的通义千问API Key"
+
+# DeepSeek API Key（可选）
+$env:DEEPSEEK_API_KEY="你的DeepSeek API Key"
+
 python server.py
 ```
 
 **Windows 永久设置**:
 1. 右键「此电脑」→「属性」→「高级系统设置」
 2. 点击「环境变量」
-3. 在「用户变量」中新建变量名 `DASHSCOPE_API_KEY`
+3. 在「用户变量」中新建：
+   - `DASHSCOPE_API_KEY` = 你的通义千问 API Key
+   - `DEEPSEEK_API_KEY` = 你的 DeepSeek API Key（可选）
 
 ### Vercel 部署
 
 在 Vercel 项目设置中添加环境变量：
-- **Key**: `DASHSCOPE_API_KEY`
-- **Value**: 你的通义千问 API Key
+- **Key**: `DASHSCOPE_API_KEY`，**Value**: 你的通义千问 API Key
+- **Key**: `DEEPSEEK_API_KEY`，**Value**: 你的 DeepSeek API Key（可选）
+
+**注意**：至少需要配置一个 API Key 才能使用 AI 对话功能
 
 ## 工作原理
 

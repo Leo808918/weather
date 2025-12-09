@@ -27,8 +27,9 @@ from datetime import datetime
 # 服务器端口
 PORT = 8000
 
-# 通义千问 API 地址
+# API 地址配置
 QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 # 数据存储文件路径
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
@@ -130,12 +131,26 @@ class ProxyHandler(SimpleHTTPRequestHandler):
     
     def handle_check(self):
         """检查 API Key 是否已配置"""
-        api_key = os.environ.get('DASHSCOPE_API_KEY', '')
-        has_key = bool(api_key)
+        qwen_key = os.environ.get('DASHSCOPE_API_KEY', '')
+        deepseek_key = os.environ.get('DEEPSEEK_API_KEY', '')
+        
+        has_qwen = bool(qwen_key)
+        has_deepseek = bool(deepseek_key)
+        
+        if has_qwen and has_deepseek:
+            message = '通义千问和 DeepSeek API Key 已配置'
+        elif has_qwen:
+            message = '通义千问 API Key 已配置（DeepSeek 未配置）'
+        elif has_deepseek:
+            message = 'DeepSeek API Key 已配置（通义千问未配置）'
+        else:
+            message = '未配置 API Key，请设置 DASHSCOPE_API_KEY 或 DEEPSEEK_API_KEY'
         
         self.send_json_response({
-            'configured': has_key,
-            'message': 'API Key 已配置' if has_key else '未找到 DASHSCOPE_API_KEY 环境变量'
+            'configured': has_qwen or has_deepseek,
+            'message': message,
+            'qwen_configured': has_qwen,
+            'deepseek_configured': has_deepseek
         })
     
     def handle_chat(self):
