@@ -154,20 +154,33 @@ class ProxyHandler(SimpleHTTPRequestHandler):
         })
     
     def handle_chat(self):
-        """处理聊天请求，转发到通义千问 API"""
-        api_key = os.environ.get('DASHSCOPE_API_KEY', '')
-        
-        if not api_key:
-            self.send_error_response(500, '未配置 DASHSCOPE_API_KEY 环境变量')
-            return
-        
+        """处理聊天请求，转发到相应的 AI API（通义千问或 DeepSeek）"""
         try:
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             request_body = json.loads(post_data.decode('utf-8'))
             
+            # 获取模型名称
+            model = request_body.get('model', 'qwen-turbo')
+            
+            # 判断使用哪个 API
+            if model.startswith('deepseek'):
+                # DeepSeek 模型
+                api_key = os.environ.get('DEEPSEEK_API_KEY', '')
+                api_url = DEEPSEEK_API_URL
+                if not api_key:
+                    self.send_error_response(500, '未配置 DEEPSEEK_API_KEY 环境变量')
+                    return
+            else:
+                # 通义千问模型
+                api_key = os.environ.get('DASHSCOPE_API_KEY', '')
+                api_url = QWEN_API_URL
+                if not api_key:
+                    self.send_error_response(500, '未配置 DASHSCOPE_API_KEY 环境变量')
+                    return
+            
             req = urllib.request.Request(
-                QWEN_API_URL,
+                api_url,
                 data=json.dumps(request_body).encode('utf-8'),
                 headers={
                     'Content-Type': 'application/json',
