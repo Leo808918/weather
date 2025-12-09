@@ -495,14 +495,23 @@
         if (el.aiSidebar) {
             // 先移除拖动状态
             el.aiSidebar.classList.remove('dragging');
+            
+            // 获取当前实际宽度（包括自定义宽度）
+            const currentWidth = el.aiSidebar.offsetWidth || 600;
+            
             // 移除active类，触发CSS动画隐藏
             el.aiSidebar.classList.remove('active');
-            // 确保right值正确（CSS会处理，但这里强制确保）
-            // 等待动画完成后，确保完全隐藏
+            
+            // 根据当前宽度设置right值，确保完全隐藏
+            // 如果宽度是400px，则right应该是-400px，这样就能完全隐藏
+            el.aiSidebar.style.right = `-${currentWidth}px`;
+            
+            // 等待动画完成后，确保完全隐藏（双重保险）
             setTimeout(() => {
                 if (el.aiSidebar && !el.aiSidebar.classList.contains('active')) {
-                    // 确保侧边栏完全隐藏
-                    el.aiSidebar.style.right = '';
+                    // 再次确保侧边栏完全隐藏
+                    const finalWidth = el.aiSidebar.offsetWidth || 600;
+                    el.aiSidebar.style.right = `-${finalWidth}px`;
                 }
             }, 350); // 等待动画完成（300ms + 50ms缓冲）
         }

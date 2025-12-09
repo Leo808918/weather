@@ -370,6 +370,8 @@ body {
     z-index: 200;
     cursor: default;
     user-select: none;
+    /* 确保关闭时能根据实际宽度完全隐藏 */
+    box-sizing: border-box;
 }
 
 .ai-sidebar.active {
