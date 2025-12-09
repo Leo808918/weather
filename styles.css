@@ -635,6 +635,7 @@ body {
     padding: 16px 20px;
     border-top: 1px solid var(--border-color);
     display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 
@@ -647,26 +648,62 @@ body {
     resize: none;
     outline: none;
     font-family: inherit;
+    width: 100%;
 }
 
 .ai-input-area textarea:focus {
     border-color: var(--accent-color);
 }
 
+.ai-input-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.quick-model-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.85rem;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    min-width: 140px;
+}
+
+.quick-model-select:hover {
+    border-color: var(--accent-color);
+}
+
+.quick-model-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+}
+
 .btn-send {
     background: var(--accent-color);
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 20px;
     border-radius: var(--border-radius-sm);
     font-size: 0.9rem;
     cursor: pointer;
     transition: background 0.2s ease;
-    align-self: flex-end;
+    white-space: nowrap;
 }
 
 .btn-send:hover {
     background: var(--accent-hover);
+}
+
+.btn-send:disabled {
+    background: var(--border-color);
+    color: var(--text-secondary);
+    cursor: not-allowed;
 }
 
 .btn-send:disabled {

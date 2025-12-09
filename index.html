@@ -131,7 +131,20 @@
         </div>
             <div class="ai-input-area">
                 <textarea id="aiInput" placeholder="输入你的问题..." rows="2"></textarea>
-                <button class="btn-send" id="sendAI">发送</button>
+                <div class="ai-input-actions">
+                    <select id="quickModelSelect" class="quick-model-select" title="选择模型">
+                        <optgroup label="通义千问">
+                            <option value="qwen-turbo">qwen-turbo</option>
+                            <option value="qwen-plus">qwen-plus</option>
+                            <option value="qwen-max">qwen-max</option>
+                        </optgroup>
+                        <optgroup label="DeepSeek">
+                            <option value="deepseek-chat">deepseek-chat</option>
+                            <option value="deepseek-coder">deepseek-coder</option>
+                        </optgroup>
+                    </select>
+                    <button class="btn-send" id="sendAI">发送</button>
+                </div>
             </div>
         </div>
     </div>
