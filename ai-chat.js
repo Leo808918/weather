@@ -43,6 +43,10 @@
                 toggleAIBtn: document.getElementById('toggleAI'),
                 closeAIBtn: document.getElementById('closeAI'),
                 newChatBtn: document.getElementById('newChatBtn'),
+                chatList: document.getElementById('chatList'),
+                chatListSidebar: document.getElementById('chatListSidebar'),
+                toggleChatList: document.getElementById('toggleChatList'),
+                currentChatTitle: document.getElementById('currentChatTitle'),
                 settingsModal: document.getElementById('settingsModal'),
                 openSettingsBtn: document.getElementById('openSettings'),
                 closeSettingsBtn: document.getElementById('closeSettings'),
@@ -109,23 +113,157 @@
         localStorage.setItem('ai_config', JSON.stringify(apiConfig));
     }
     
-    function loadChatHistory() {
-        const saved = localStorage.getItem('chat_history');
+    // ==================== 对话会话管理 ====================
+    
+    function loadConversations() {
+        const saved = localStorage.getItem('ai_conversations');
         if (saved) {
             try {
-                chatHistory = JSON.parse(saved);
-                renderChatHistory();
+                conversations = JSON.parse(saved);
+                // 如果没有对话，创建第一个
+                if (conversations.length === 0) {
+                    createNewConversation();
+                } else {
+                    // 加载最后一个对话
+                    currentConversationId = conversations[conversations.length - 1].id;
+                    loadConversation(currentConversationId);
+                }
             } catch (e) {
-                console.error('加载对话历史失败:', e);
+                console.error('加载对话会话失败:', e);
+                createNewConversation();
+            }
+        } else {
+            createNewConversation();
+        }
+        renderChatList();
+    }
+    
+    function saveConversations() {
+        // 更新当前对话
+        if (currentConversationId) {
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (conv) {
+                conv.messages = chatHistory;
+                conv.updatedAt = new Date().toISOString();
+                // 如果没有标题且有消息，生成标题
+                if (!conv.title || conv.title === '新对话') {
+                    const firstUserMsg = chatHistory.find(m => m.role === 'user');
+                    if (firstUserMsg) {
+                        conv.title = firstUserMsg.content.substring(0, 30) || '新对话';
+                    }
+                }
+            }
+        }
+        localStorage.setItem('ai_conversations', JSON.stringify(conversations));
+    }
+    
+    function createNewConversation() {
+        const newId = 'conv_' + Date.now();
+        const newConv = {
+            id: newId,
+            title: '新对话',
+            messages: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        conversations.push(newConv);
+        currentConversationId = newId;
+        chatHistory = [];
+        saveConversations();
+        renderChatList();
+        renderChatHistory();
+    }
+    
+    function loadConversation(conversationId) {
+        const conv = conversations.find(c => c.id === conversationId);
+        if (conv) {
+            currentConversationId = conversationId;
+            chatHistory = conv.messages || [];
+            renderChatHistory();
+            updateChatTitle();
+        }
+    }
+    
+    function deleteConversation(conversationId) {
+        const index = conversations.findIndex(c => c.id === conversationId);
+        if (index !== -1) {
+            conversations.splice(index, 1);
+            saveConversations();
+            
+            // 如果删除的是当前对话
+            if (conversationId === currentConversationId) {
+                if (conversations.length > 0) {
+                    // 切换到最后一个对话
+                    currentConversationId = conversations[conversations.length - 1].id;
+                    loadConversation(currentConversationId);
+                } else {
+                    // 创建新对话
+                    createNewConversation();
+                }
+            }
+            renderChatList();
+        }
+    }
+    
+    function updateChatTitle() {
+        const el = getElements();
+        if (el.currentChatTitle && currentConversationId) {
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (conv) {
+                el.currentChatTitle.textContent = conv.title || '🤖 AI助手';
             }
         }
     }
     
-    function saveChatHistory() {
-        if (chatHistory.length > 50) {
-            chatHistory = chatHistory.slice(-50);
-        }
-        localStorage.setItem('chat_history', JSON.stringify(chatHistory));
+    function renderChatList() {
+        const el = getElements();
+        if (!el.chatList) return;
+        
+        el.chatList.innerHTML = '';
+        
+        // 按更新时间倒序排列
+        const sortedConvs = [...conversations].sort((a, b) => 
+            new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
+        
+        sortedConvs.forEach(conv => {
+            const chatItem = document.createElement('div');
+            chatItem.className = 'chat-item';
+            if (conv.id === currentConversationId) {
+                chatItem.classList.add('active');
+            }
+            
+            const title = document.createElement('div');
+            title.className = 'chat-item-title';
+            title.textContent = conv.title || '新对话';
+            title.title = conv.title || '新对话';
+            
+            const actions = document.createElement('div');
+            actions.className = 'chat-item-actions';
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-delete-chat';
+            deleteBtn.textContent = '×';
+            deleteBtn.title = '删除对话';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('确定要删除这个对话吗？')) {
+                    deleteConversation(conv.id);
+                }
+            };
+            
+            actions.appendChild(deleteBtn);
+            
+            chatItem.appendChild(title);
+            chatItem.appendChild(actions);
+            
+            chatItem.onclick = () => {
+                loadConversation(conv.id);
+                renderChatList();
+            };
+            
+            el.chatList.appendChild(chatItem);
+        });
     }
     
     // ==================== 事件绑定 ====================
@@ -172,13 +310,19 @@
         // 新对话按钮
         if (el.newChatBtn) {
             el.newChatBtn.addEventListener('click', () => {
-                if (chatHistory.length > 0) {
-                    if (confirm('确定要开始新对话吗？当前对话历史将被清空。')) {
-                        clearChatHistory();
-                        showToast('已开启新对话');
-                    }
-                } else {
-                    showToast('当前没有对话历史');
+                createNewConversation();
+                showToast('已创建新对话');
+            });
+        }
+        
+        // 切换对话列表显示
+        if (el.toggleChatList) {
+            el.toggleChatList.addEventListener('click', () => {
+                const sidebar = el.chatListSidebar;
+                if (sidebar) {
+                    sidebar.classList.toggle('collapsed');
+                    const btn = el.toggleChatList;
+                    btn.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
                 }
             });
         }
@@ -317,7 +461,8 @@
             removeLoading(loadingId);
             addMessage('assistant', response);
             chatHistory.push({ role: 'assistant', content: response });
-            saveChatHistory();
+            saveConversations();
+            renderChatList(); // 更新对话列表（可能更新标题）
         } catch (error) {
             removeLoading(loadingId);
             addMessage('assistant', `抱歉，发生错误：${error.message}`);
@@ -485,14 +630,6 @@
     
     // ==================== 工具函数 ====================
     
-    /**
-     * 清空对话历史
-     */
-    function clearChatHistory() {
-        chatHistory = [];
-        saveChatHistory();
-        renderChatHistory();
-    }
     
     // ==================== 启动 ====================
     
