@@ -555,6 +555,87 @@ weather/
 
 ---
 
+## 问题：GitHub 推送代码网络连接失败
+
+### 问题描述
+推送代码到 GitHub 时频繁出现以下错误：
+- `fatal: unable to access 'https://github.com/...': Recv failure: Connection was reset`
+- `Failed to connect to github.com port 443 after 21000+ ms: Could not connect to server`
+
+### 可能原因
+1. **网络环境限制**：防火墙、代理或 ISP 限制
+2. **HTTPS 连接不稳定**：443 端口连接问题
+3. **Git 配置不当**：超时时间、缓冲区设置
+4. **GitHub 服务器问题**：临时性服务器问题
+
+### 解决方案
+
+#### 方案 1：优化 Git 网络配置（已尝试）
+```powershell
+# 增加超时时间
+git config --global http.timeout 600
+git config --global http.lowSpeedLimit 0
+git config --global http.lowSpeedTime 999999
+git config --global http.postBuffer 1048576000
+
+# 使用 HTTP/1.1 协议
+git config --global http.version HTTP/1.1
+```
+
+#### 方案 2：使用 SSH 方式（推荐）
+如果已配置 SSH 密钥，可以改用 SSH URL：
+```powershell
+# 查看当前远程地址
+git remote -v
+
+# 切换到 SSH 方式
+git remote set-url origin git@github.com:Leo808918/weather.git
+
+# 推送
+git push
+```
+
+#### 方案 3：使用 GitHub Desktop
+- 下载安装 GitHub Desktop
+- 使用图形界面推送，通常更稳定
+
+#### 方案 4：配置代理（如果有代理）
+```powershell
+# 设置 HTTP 代理
+git config --global http.proxy http://proxy.example.com:8080
+git config --global https.proxy https://proxy.example.com:8080
+
+# 取消代理
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
+
+#### 方案 5：分批推送
+如果文件较大，可以尝试分批推送：
+```powershell
+# 只推送特定文件
+git push origin main --verbose
+```
+
+#### 方案 6：使用移动热点
+切换网络环境（如使用手机热点）后重试
+
+#### 方案 7：稍后重试
+可能是临时网络波动，等待一段时间后重试
+
+### 当前状态
+- ✅ 所有代码已保存在本地 Git 仓库
+- ✅ 提交记录完整
+- ⚠️ 推送至远程仓库失败（网络问题）
+
+### 临时解决方案
+代码已安全保存在本地，可以：
+1. 继续本地开发
+2. 稍后网络稳定时再推送
+3. 使用 GitHub Desktop 或其他工具推送
+
+---
+
 *文档创建日期：2024年12月*
 *最后更新：项目完成时*
 
