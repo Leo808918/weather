@@ -470,13 +470,23 @@
         const el = getElements();
         if (!el.aiSidebar) return;
         
+        const isActive = el.aiSidebar.classList.contains('active');
         el.aiSidebar.classList.toggle('active');
         
         if (el.aiSidebar.classList.contains('active')) {
+            // 显示遮罩层
+            if (el.overlay) {
+                el.overlay.classList.add('active');
+            }
             if (el.aiInput) {
                 el.aiInput.focus();
             }
             checkAPIStatus();
+        } else {
+            // 隐藏遮罩层
+            if (el.overlay) {
+                el.overlay.classList.remove('active');
+            }
         }
     }
     
@@ -484,7 +494,16 @@
         const el = getElements();
         if (el.aiSidebar) {
             el.aiSidebar.classList.remove('active');
+            // 确保移除拖动状态
+            el.aiSidebar.classList.remove('dragging');
         }
+        // 隐藏遮罩层
+        if (el.overlay) {
+            el.overlay.classList.remove('active');
+        }
+        // 恢复 body 样式
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
     }
     
     function openSettings() {
