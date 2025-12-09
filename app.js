@@ -87,7 +87,7 @@ async function loadEntries() {
                 entries = data.entries || [];
                 useServerStorage = true;
                 console.log('✅ 从服务器加载数据成功');
-                hideStorageStatus();
+                showStorageStatus('server', '✅ 已连接服务器');
             } else {
                 throw new Error('服务器返回错误');
             }
