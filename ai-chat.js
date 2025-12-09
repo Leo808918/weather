@@ -493,9 +493,18 @@
     function closeAISidebar() {
         const el = getElements();
         if (el.aiSidebar) {
-            el.aiSidebar.classList.remove('active');
-            // 确保移除拖动状态
+            // 先移除拖动状态
             el.aiSidebar.classList.remove('dragging');
+            // 移除active类，触发CSS动画隐藏
+            el.aiSidebar.classList.remove('active');
+            // 确保right值正确（CSS会处理，但这里强制确保）
+            // 等待动画完成后，确保完全隐藏
+            setTimeout(() => {
+                if (el.aiSidebar && !el.aiSidebar.classList.contains('active')) {
+                    // 确保侧边栏完全隐藏
+                    el.aiSidebar.style.right = '';
+                }
+            }, 350); // 等待动画完成（300ms + 50ms缓冲）
         }
         // 隐藏遮罩层
         if (el.overlay) {
