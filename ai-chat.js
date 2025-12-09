@@ -471,9 +471,15 @@
         if (!el.aiSidebar) return;
         
         const isActive = el.aiSidebar.classList.contains('active');
-        el.aiSidebar.classList.toggle('active');
         
-        if (el.aiSidebar.classList.contains('active')) {
+        if (isActive) {
+            // 如果当前是打开状态，关闭它
+            closeAISidebar();
+        } else {
+            // 如果当前是关闭状态，打开它
+            el.aiSidebar.classList.add('active');
+            // 打开时，清除right的内联样式，让CSS的right: 0生效
+            el.aiSidebar.style.right = '';
             // 显示遮罩层
             if (el.overlay) {
                 el.overlay.classList.add('active');
@@ -482,11 +488,6 @@
                 el.aiInput.focus();
             }
             checkAPIStatus();
-        } else {
-            // 隐藏遮罩层
-            if (el.overlay) {
-                el.overlay.classList.remove('active');
-            }
         }
     }
     
