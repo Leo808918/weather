@@ -101,23 +101,38 @@
 
     <!-- ==================== AI对话侧边栏 ==================== -->
     <div class="ai-sidebar" id="aiSidebar">
-        <div class="ai-header">
-            <h3>🤖 AI助手</h3>
-            <div class="ai-header-actions">
-                <button class="btn-new-chat" id="newChatBtn" title="新对话">🆕 新对话</button>
-                <button class="btn-close" id="closeAI">×</button>
+        <!-- 对话列表侧边栏 -->
+        <div class="chat-list-sidebar" id="chatListSidebar">
+            <div class="chat-list-header">
+                <button class="btn-new-chat-list" id="newChatBtn" title="新对话">
+                    <span>+</span> 新对话
+                </button>
+                <button class="btn-toggle-chat-list" id="toggleChatList" title="收起/展开">◀</button>
+            </div>
+            <div class="chat-list" id="chatList">
+                <!-- 对话列表将通过JS动态生成 -->
             </div>
         </div>
-        <div class="ai-messages" id="aiMessages">
+        
+        <!-- 主对话区域 -->
+        <div class="ai-chat-main">
+            <div class="ai-header">
+                <h3 id="currentChatTitle">🤖 AI助手</h3>
+                <div class="ai-header-actions">
+                    <button class="btn-close" id="closeAI">×</button>
+                </div>
+            </div>
+            <div class="ai-messages" id="aiMessages">
             <!-- AI对话消息将通过JS动态生成 -->
             <div class="ai-welcome">
                 <p>你好！我是通义千问AI助手。</p>
                 <p>你可以问我任何问题，或者让我帮你整理日志内容。</p>
             </div>
         </div>
-        <div class="ai-input-area">
-            <textarea id="aiInput" placeholder="输入你的问题..." rows="2"></textarea>
-            <button class="btn-send" id="sendAI">发送</button>
+            <div class="ai-input-area">
+                <textarea id="aiInput" placeholder="输入你的问题..." rows="2"></textarea>
+                <button class="btn-send" id="sendAI">发送</button>
+            </div>
         </div>
     </div>
 

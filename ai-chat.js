@@ -20,7 +20,11 @@
     
     // ==================== 全局变量 ====================
     
-    let chatHistory = [];
+    // 对话会话管理
+    let conversations = []; // 所有对话会话
+    let currentConversationId = null; // 当前对话ID
+    let chatHistory = []; // 当前对话的消息历史
+    
     let apiConfig = { model: 'qwen-turbo' };
     let apiKeyConfigured = false;
     
@@ -68,9 +72,9 @@
             return;
         }
         
-        // 加载配置和历史
+        // 加载配置和对话会话
         loadConfig();
-        loadChatHistory();
+        loadConversations();
         
         // 绑定事件
         bindEvents();
